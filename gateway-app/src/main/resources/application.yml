@@ -1,0 +1,40 @@
+server:
+  port: 8080
+  # Planted: full stack traces returned to clients.
+  error:
+    include-message: always
+    include-stacktrace: always
+    include-binding-errors: always
+
+spring:
+  application:
+    name: nibbs-lab-gateway
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/ledger}
+    username: ${SPRING_DATASOURCE_USERNAME:nibbs}
+    password: ${SPRING_DATASOURCE_PASSWORD:nibbs-lab-pw}
+    driver-class-name: org.postgresql.Driver
+
+lab:
+  jwt:
+    # Weak, crackable HS256 secret (in every wordlist). The filter also accepts
+    # alg=none and HS256 signed with the RSA public key (algorithm confusion).
+    hmac-secret: ${LAB_JWT_SECRET:secret}
+  ai:
+    # Fake upstream model key; leaks via /api/assistant/config and prompt injection.
+    api-key: ${LAB_AI_API_KEY:sk-lab-UPSTREAM-9f2c7a41d0e84b6}
+
+# Planted: all actuator endpoints exposed without auth.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    ng.ccisonfi.nibbslab: DEBUG

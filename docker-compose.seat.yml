@@ -1,0 +1,47 @@
+# =============================================================================
+#  Per-seat stack for provisioning many ISOLATED lab instances (e.g. 200 seats).
+#  Each seat runs under its own compose project (-p nibbs-seat-N), which gives
+#  it a private network and its own db + gateway + edge containers. Only the
+#  edge is published, on a per-seat loopback port (EDGE_PORT). db and gateway
+#  are never published, so seats cannot collide on host ports.
+#
+#  Driven by scripts/provision.sh. Images are built once and reused by tag.
+# =============================================================================
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ledger
+      POSTGRES_USER: nibbs
+      POSTGRES_PASSWORD: nibbs-lab-pw
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks: [labnet]
+
+  gateway-app:
+    build:
+      context: ./gateway-app
+    image: nibbs-lab-gateway:seat
+    depends_on: [db]
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/ledger
+      SPRING_DATASOURCE_USERNAME: nibbs
+      SPRING_DATASOURCE_PASSWORD: nibbs-lab-pw
+      LAB_JWT_SECRET: secret
+    networks: [labnet]
+
+  edge-proxy:
+    build:
+      context: ./edge-proxy
+    image: nibbs-lab-edge:seat
+    depends_on: [gateway-app]
+    environment:
+      UPSTREAM_HOST: gateway-app
+      UPSTREAM_PORT: "8080"
+    networks: [labnet]
+    ports:
+      - "127.0.0.1:${EDGE_PORT:?set EDGE_PORT}:8088"
+
+networks:
+  labnet:
+    driver: bridge

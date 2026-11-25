@@ -1,0 +1,57 @@
+# =============================================================================
+#  nibbs-api-lab — INTENTIONALLY VULNERABLE training environment
+#  FOR LOCAL, ISOLATED LEARNING ONLY. Do NOT deploy this anywhere reachable
+#  from an untrusted network, and never point tooling built here at any real
+#  system. Everything in this stack is deliberately insecure by design.
+# =============================================================================
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: nibbs-lab-db
+    environment:
+      POSTGRES_DB: ledger
+      POSTGRES_USER: nibbs
+      POSTGRES_PASSWORD: nibbs-lab-pw        # intentionally weak / hardcoded
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - labnet
+    # Bound to loopback only so the lab is not exposed on the LAN.
+    ports:
+      - "127.0.0.1:5432:5432"
+
+  gateway-app:
+    build:
+      context: ./gateway-app
+    container_name: nibbs-lab-gateway
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/ledger
+      SPRING_DATASOURCE_USERNAME: nibbs
+      SPRING_DATASOURCE_PASSWORD: nibbs-lab-pw
+      # Weak, crackable signing secret — one of the planted issues.
+      LAB_JWT_SECRET: secret
+    networks:
+      - labnet
+    expose:
+      - "8080"
+
+  edge-proxy:
+    build:
+      context: ./edge-proxy
+    container_name: nibbs-lab-edge
+    depends_on:
+      - gateway-app
+    environment:
+      UPSTREAM_HOST: gateway-app
+      UPSTREAM_PORT: "8080"
+    networks:
+      - labnet
+    # The only surface a participant needs; bound to loopback.
+    ports:
+      - "127.0.0.1:${EDGE_PORT:-8088}:8088"
+
+networks:
+  labnet:
+    driver: bridge
