@@ -53,9 +53,7 @@ public class AuthController {
                         .getBytes(StandardCharsets.UTF_8));
         String signingInput = header + "." + payload;
         String sig = hmacSha256(signingInput, hmacSecret.getBytes(StandardCharsets.UTF_8));
-        return Map.of(
-                "token", signingInput + "." + sig,
-                "hint", "HS256, signed with a weak secret. Crack it and forge role=ADMIN.");
+        return Map.of("token", signingInput + "." + sig);
     }
 
     /** Publishes the RSA public key — needed for the RS256->HS256 confusion attack. */
@@ -78,9 +76,7 @@ public class AuthController {
         signer.initSign(pk);
         signer.update(signingInput.getBytes(StandardCharsets.UTF_8));
         String sig = B64.encodeToString(signer.sign());
-        return Map.of(
-                "token", signingInput + "." + sig,
-                "hint", "RS256 service token. The verifier also trusts HS256 signed with the public key.");
+        return Map.of("token", signingInput + "." + sig);
     }
 
     private static String hmacSha256(String data, byte[] key) {

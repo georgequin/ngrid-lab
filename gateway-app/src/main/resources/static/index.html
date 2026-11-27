@@ -3,320 +3,175 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NIBBS Lab</title>
+<title>Ngrid Online Banking</title>
 <style>
-  :root{--line:#e3e3e3;--mut:#6b7280;--brand:#1746a2;--ok:#0a7d3c;--bad:#b00020;--bg:#f7f8fa}
+  :root{--line:#e3e6eb;--mut:#6b7280;--brand:#0b5cad;--brand2:#0a4e94;--ok:#0a7d3c;--bad:#b00020;--bg:#eef1f5}
   *{box-sizing:border-box}
-  body{font:14px/1.5 system-ui,sans-serif;margin:0;color:#111;background:var(--bg)}
-  button{font:13px sans-serif;padding:7px 12px;cursor:pointer;border:1px solid #9aa3af;
-         border-radius:5px;background:#fff}
-  button:hover{background:#f0f1f3}
+  body{font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;margin:0;color:#111827;background:var(--bg)}
+  button{font:13px sans-serif;padding:8px 14px;cursor:pointer;border:1px solid #c3c9d2;border-radius:6px;background:#fff}
+  button:hover{background:#f3f5f8}
   button.pri{background:var(--brand);border-color:var(--brand);color:#fff}
-  button.pri:hover{filter:brightness(1.08)}
-  button.sm{padding:3px 8px;font-size:12px}
-  input{font:13px sans-serif;padding:7px 8px;border:1px solid #cbd0d8;border-radius:5px;width:100%}
-  label{font-size:12px;color:var(--mut);display:block;margin-bottom:3px}
+  button.pri:hover{background:var(--brand2)}
+  input,select{font:13px sans-serif;padding:8px 9px;border:1px solid #cbd0d8;border-radius:6px;width:100%;background:#fff}
+  label{font-size:12px;color:var(--mut);display:block;margin-bottom:4px}
   .hidden{display:none!important}
 
-  /* login */
-  #login{max-width:360px;margin:9vh auto;background:#fff;border:1px solid var(--line);
-         border-radius:10px;padding:26px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-  #login h1{font-size:18px;margin:0 0 2px}
-  #login .sub{color:var(--mut);font-size:12.5px;margin-bottom:18px}
-  #login .f{margin-bottom:12px}
-  #login button{width:100%;margin-top:4px}
+  #login{max-width:380px;margin:8vh auto;background:#fff;border:1px solid var(--line);border-radius:12px;padding:30px;box-shadow:0 2px 12px rgba(16,32,64,.08)}
+  #login .logo{font-weight:800;color:var(--brand);font-size:20px;letter-spacing:-.3px}
+  #login h1{font-size:16px;margin:14px 0 2px}
+  #login .sub{color:var(--mut);font-size:12.5px;margin-bottom:20px}
+  #login .f{margin-bottom:14px}
+  #login button{width:100%;margin-top:6px}
   #loginErr{color:var(--bad);font-size:13px;margin-top:12px;min-height:18px}
 
-  /* app */
-  header{background:#fff;border-bottom:1px solid var(--line);padding:10px 18px;
-         display:flex;align-items:center;gap:14px}
-  header .brand{font-weight:700;color:var(--brand)}
+  header{background:#fff;border-bottom:1px solid var(--line);padding:12px 20px;display:flex;align-items:center;gap:14px}
+  header .logo{font-weight:800;color:var(--brand);font-size:17px}
+  header .who{font-size:12.5px;color:var(--mut)}
   header .bal{margin-left:auto;text-align:right}
   header .bal b{font-size:16px}header .bal span{display:block;font-size:11px;color:var(--mut)}
-  header .who{font-size:12px;color:var(--mut)}
-  main{max-width:960px;margin:18px auto;padding:0 16px;display:grid;
-       grid-template-columns:1fr 1fr;gap:16px}
-  @media(max-width:760px){main{grid-template-columns:1fr}}
-  .card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  main{max-width:900px;margin:20px auto;padding:0 16px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:740px){main{grid-template-columns:1fr}}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px}
   .card.full{grid-column:1/-1}
-  .card h2{font-size:13px;text-transform:uppercase;letter-spacing:.4px;color:var(--mut);
-           margin:0 0 10px}
+  .card h2{font-size:13px;text-transform:uppercase;letter-spacing:.4px;color:var(--mut);margin:0 0 12px}
   .row{display:flex;gap:10px}.row>div{flex:1}
-  .mt{margin-top:10px}
+  .mt{margin-top:12px}
   table{border-collapse:collapse;width:100%;font-size:12.5px}
-  th,td{border-bottom:1px solid var(--line);padding:5px 7px;text-align:left}
+  th,td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left}
   th{color:var(--mut);font-weight:600;font-size:11px;text-transform:uppercase}
-  tr.me td{background:#eef4ff}
-  .msg{font-size:13px;margin-top:8px;white-space:pre-wrap;word-break:break-word}
-  .msg.ok{color:var(--ok)}.msg.err{color:var(--bad)}
-  .chk{font-size:12.5px;color:#333;display:flex;align-items:center;gap:6px;margin-top:6px}
-  .chk input{width:auto}
   .money{font-variant-numeric:tabular-nums}
-  .foot{color:var(--mut);font-size:11px}
-  code{background:#f0f1f3;padding:0 3px;border-radius:2px}
+  .msg{font-size:13px;margin-top:10px;white-space:pre-wrap;word-break:break-word}
+  .msg.ok{color:var(--ok)}.msg.err{color:var(--bad)}
+  .foot{color:var(--mut);font-size:12px}
 </style>
 </head>
 <body>
 
-<!-- ===================== LOGIN ===================== -->
 <div id="login">
-  <h1>Ngrid Lab Session</h1>
-  <div class="sub">Lab gateway · behind edge-proxy :8088</div>
-  <div class="f"><label>Username</label><input id="username" value="alice" autocomplete="off"></div>
-  <div class="f"><label>Password</label><input id="password" type="password" value="x" autocomplete="off"></div>
+  <div class="logo">Ngrid Bank</div>
+  <h1>Online Banking</h1>
+  <div class="sub">Sign in to your account</div>
+  <div class="f"><label>Username</label><input id="username" autocomplete="username"></div>
+  <div class="f"><label>Password</label><input id="password" type="password" autocomplete="current-password"></div>
   <button class="pri" onclick="doLogin()">Sign in</button>
   <div id="loginErr"></div>
 </div>
 
-<!-- ===================== APP ===================== -->
 <header id="appHeader" class="hidden">
-  <span class="brand">Ngrid Lab Session</span>
+  <span class="logo">Ngrid Bank</span>
   <span class="who" id="who"></span>
-  <div class="bal"><b class="money" id="hdrBal">—</b><span>primary balance</span></div>
-  <button class="sm" onclick="openDev()">Dev mode</button>
-  <button class="sm" onclick="logout()">Sign out</button>
+  <div class="bal"><b class="money" id="hdrBal">—</b><span>available balance</span></div>
+  <button onclick="logout()">Sign out</button>
 </header>
 
 <main id="app" class="hidden">
-
-  <div class="card">
-    <h2>My accounts</h2>
-    <div id="myAccounts"></div>
+  <div class="card full">
+    <h2>Your accounts</h2>
+    <div id="myAccounts" class="foot">Loading…</div>
   </div>
 
   <div class="card">
-    <h2>Transfer</h2>
-    <div class="row">
-      <div><label>From</label><input id="tFrom" value="1001"></div>
-      <div><label>To</label><input id="tTo" value="1002"></div>
-    </div>
+    <h2>Make a transfer</h2>
+    <div><label>From account</label><select id="tFrom"></select></div>
     <div class="row mt">
-      <div><label>Amount (minor)</label><input id="tAmt" value="50000"></div>
-      <div><label>Memo</label><input id="tMemo" value="transfer"></div>
+      <div><label>To account</label><input id="tTo" placeholder="account number"></div>
+      <div><label>Amount</label><input id="tAmt" placeholder="0.00"></div>
     </div>
-    <label class="chk"><input type="checkbox" id="sendAuth" checked> send Bearer token</label>
-    <label class="chk"><input type="checkbox" id="sendInternalT"> spoof <code>X-Internal-Caller</code></label>
+    <div class="mt"><label>Memo</label><input id="tMemo" placeholder="e.g. rent"></div>
     <button class="pri mt" onclick="doTransfer()">Send transfer</button>
     <div id="transferMsg" class="msg"></div>
   </div>
 
-  <div class="card full">
-    <h2>All accounts</h2>
-    <div class="row" style="align-items:flex-end;max-width:420px">
-      <div><label>Look up by ID (BOLA)</label><input id="acctLookup" placeholder="e.g. 1003"></div>
-      <div style="flex:0 0 auto"><button class="sm" onclick="lookupAccount()">GET /accounts/{id}</button>
-        <button class="sm" onclick="loadAllAccounts()">refresh all</button></div>
-    </div>
-    <div id="accountsOut" class="mt"></div>
-  </div>
-
-  <div class="card full">
-    <h2>Transactions</h2>
-    <div class="row" style="align-items:flex-end;max-width:360px">
-      <div><label>Account ID</label><input id="txAcct" value="1001"></div>
-      <div style="flex:0 0 auto"><button class="sm" onclick="loadTransfers()">Load</button></div>
-    </div>
-    <div id="txOut" class="mt"></div>
-  </div>
-
   <div class="card">
-    <h2>Internal / admin</h2>
-    <label>Path</label><input id="intPath" value="/internal/settlement/health">
-    <label class="chk"><input type="checkbox" id="sendInternalHdr" checked> <code>X-Internal-Caller: true</code> (role=ADMIN)</label>
-    <div class="mt"><button class="sm" onclick="internalHealth()">GET health</button>
-      <button class="sm" onclick="internalBatch()">POST batch</button></div>
-    <label class="mt">Batch legs JSON</label>
-    <input id="batchJson" value='[{"from":9001,"to":1001,"amountMinor":1000000,"ref":"demo"}]'>
-    <div id="internalMsg" class="msg"></div>
+    <h2>Recent activity</h2>
+    <div><label>Account</label><select id="txAcct" onchange="loadTransfers()"></select></div>
+    <div id="txOut" class="mt foot">—</div>
   </div>
-
-  <div class="card">
-    <h2>Recon extras</h2>
-    <button class="sm" onclick="assistantConfig()">/assistant/config</button>
-    <button class="sm" onclick="actuatorEnv()">/actuator/env</button>
-    <button class="sm" onclick="doReset()">POST /reset</button>
-    <div id="extraMsg" class="msg"></div>
-  </div>
-
-  <div class="card full foot">
-    Frontend is just an API client — intercept &amp; tamper with Burp on :8088.
-    Endpoint paths live in the <code>CONFIG</code> object at the top of the page source.
-  </div>
-
 </main>
 
 <script>
-/* All endpoints in one place; relative paths = same-origin behind the edge proxy. */
-const CONFIG = {
-  login:'/api/auth/login', pubkey:'/api/auth/pubkey', serviceToken:'/api/auth/service-token',
-  accounts:'/api/accounts', accountById:'/api/accounts/', transfersFor:'/api/accounts/',
-  transfer:'/api/transfers', internalBatch:'/internal/settlement/batch',
-  reset:'/reset', assistantCfg:'/api/assistant/config', actuatorEnv:'/actuator/env',
-  authHeader:'Authorization', authScheme:'Bearer ', internalHdr:'X-Internal-Caller',
-};
-let STATE={token:null,subject:null};
+const API={ login:'/api/auth/login', accounts:'/api/accounts', transfer:'/api/transfers' };
+let STATE={token:null,subject:null,accounts:[]};
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const money=(m,c)=>{const n=Number(m);return isFinite(n)?(n/100).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})+(c?' '+c:''):String(m);};
-const num=v=>{const x=Number(v);return isNaN(x)?v:x;}; // let bad input reach the API
-function msg(el,ok,m){el.className='msg '+(ok?'ok':'err');el.textContent=m;}
 
-/* ---------- single fetch wrapper (feeds the Dev-mode window) ---------- */
-async function api(method,path,{body,auth=false,internal=false}={}){
+async function api(method,path,body){
   const headers={};
   if(body!==undefined) headers['Content-Type']='application/json';
-  if(auth&&STATE.token) headers[CONFIG.authHeader]=CONFIG.authScheme+STATE.token;
-  if(internal) headers[CONFIG.internalHdr]='true';
-  const bodyStr=body!==undefined?(typeof body==='string'?body:JSON.stringify(body)):undefined;
-  const entry=devLogReq(method,path,headers,bodyStr);
-  let res,text;
-  try{ res=await fetch(path,{method,headers,body:bodyStr}); text=await res.text(); }
-  catch(e){ devLogRes(entry,null,'network error: '+e.message); throw e; }
+  if(STATE.token) headers['Authorization']='Bearer '+STATE.token;
+  const res=await fetch(path,{method,headers,body:body!==undefined?JSON.stringify(body):undefined});
+  const text=await res.text();
   let json=null; try{json=JSON.parse(text);}catch(_){}
-  devLogRes(entry,res,text);
   return {res,text,json,ok:res.ok};
 }
 
-/* ---------- auth / view switching ---------- */
 async function doLogin(){
   $('loginErr').textContent='';
-  const username=$('username').value, password=$('password').value;
+  const username=$('username').value.trim(), password=$('password').value;
+  if(!username){$('loginErr').textContent='Enter your username.';return;}
   let r;
-  try{ r=await api('POST',CONFIG.login,{body:{username,password}}); }
-  catch(e){ $('loginErr').textContent='Cannot reach gateway: '+e.message; return; }
+  try{ r=await api('POST',API.login,{username,password}); }
+  catch(e){ $('loginErr').textContent='Cannot reach the server. Please try again.'; return; }
   if(r.ok && r.json && r.json.token){
     STATE.token=r.json.token; STATE.subject=username;
     enterApp();
   }else{
-    $('loginErr').textContent = (r.json&&(r.json.message||r.json.error)) || r.text || ('Login failed ('+r.res.status+')');
+    $('loginErr').textContent='Sign in failed. Check your details and try again.';
   }
 }
 function enterApp(){
   $('login').classList.add('hidden');
   $('appHeader').classList.remove('hidden');
   $('app').classList.remove('hidden');
-  $('who').textContent='signed in as '+STATE.subject;
-  $('txAcct').value='';
-  loadAllAccounts().then(loadMine);
+  $('who').textContent='Signed in as '+STATE.subject;
+  loadAccounts();
 }
 function logout(){
-  STATE={token:null,subject:null};
+  STATE={token:null,subject:null,accounts:[]};
   $('app').classList.add('hidden'); $('appHeader').classList.add('hidden');
-  $('login').classList.remove('hidden'); $('loginErr').textContent='';
+  $('login').classList.remove('hidden'); $('password').value='';
 }
 
-/* ---------- accounts ---------- */
-let ALL=[];
-async function loadAllAccounts(){
-  const {json,ok}=await api('GET',CONFIG.accounts+'?owner=',{auth:true}); // empty LIKE -> all rows
-  ALL = (ok&&Array.isArray(json))?json:[];
-  renderAll(ALL);
-  return ALL;
+async function loadAccounts(){
+  const {json,ok}=await api('GET',API.accounts+'?owner='+encodeURIComponent(STATE.subject));
+  STATE.accounts=(ok&&Array.isArray(json))?json:[];
+  renderAccounts(); fillAccountSelects();
+  if(STATE.accounts[0]){ $('hdrBal').textContent=money(STATE.accounts[0].balance_minor,STATE.accounts[0].currency); loadTransfers(); }
+  else $('hdrBal').textContent='—';
 }
-function loadMine(){
-  const mine=ALL.filter(a=>String(a.owner_sub)===String(STATE.subject));
-  if(mine.length){
-    $('hdrBal').textContent=money(mine[0].balance_minor,mine[0].currency);
-    $('tFrom').value=mine[0].id; $('txAcct').value=mine[0].id;
-  }else $('hdrBal').textContent='—';
-  $('myAccounts').innerHTML = mine.length
-    ? accTable(mine) : '<div class="foot">No account owns sub="'+esc(STATE.subject)+'". Use All accounts below.</div>';
+function renderAccounts(){
+  const rows=STATE.accounts;
+  $('myAccounts').innerHTML = rows.length
+    ? '<table><tr><th>Account</th><th>Currency</th><th>Balance</th></tr>'+
+      rows.map(a=>'<tr><td>'+esc(a.id)+'</td><td>'+esc(a.currency)+'</td><td class="money">'+esc(money(a.balance_minor,a.currency))+'</td></tr>').join('')+'</table>'
+    : '<div class="foot">No accounts found for this profile.</div>';
 }
-function renderAll(rows){ $('accountsOut').innerHTML = rows.length? accTable(rows) : '<div class="foot">no rows</div>'; }
-function accTable(rows){
-  return '<table><tr><th>ID</th><th>Owner</th><th>Cur</th><th>Balance</th><th></th></tr>'+
-    rows.map(a=>{
-      const me=String(a.owner_sub)===String(STATE.subject)?' class="me"':'';
-      return '<tr'+me+'><td>'+esc(a.id)+'</td><td>'+esc(a.owner_sub)+'</td><td>'+esc(a.currency)+
-        '</td><td class="money">'+esc(money(a.balance_minor,a.currency))+
-        '</td><td><button class="sm" onclick="pickFrom('+esc(a.id)+')">use</button></td></tr>';
-    }).join('')+'</table>';
+function fillAccountSelects(){
+  const opts=STATE.accounts.map(a=>'<option value="'+esc(a.id)+'">'+esc(a.id)+' · '+esc(money(a.balance_minor,a.currency))+'</option>').join('');
+  $('tFrom').innerHTML=opts; $('txAcct').innerHTML=opts;
 }
-function pickFrom(id){$('tFrom').value=id;$('txAcct').value=id;}
-async function lookupAccount(){
-  const id=$('acctLookup').value.trim(); if(!id)return;
-  const {json,text,ok}=await api('GET',CONFIG.accountById+id,{auth:true});
-  $('accountsOut').innerHTML = (ok&&Array.isArray(json)&&json.length)? accTable(json)
-    : '<div class="msg err">'+esc(text)+'</div>';
-}
-
-/* ---------- transfers ---------- */
 async function loadTransfers(){
-  const id=$('txAcct').value.trim(); if(!id)return;
-  const {json,text,ok}=await api('GET',CONFIG.transfersFor+id+'/transfers',{auth:true});
+  const id=$('txAcct').value; if(!id)return;
+  const {json,ok}=await api('GET',API.accounts+'/'+id+'/transfers');
   if(ok&&Array.isArray(json)){
-    $('txOut').innerHTML = json.length? '<table><tr><th>ID</th><th>From</th><th>To</th><th>Amount</th><th>Memo</th><th>At</th></tr>'+
-      json.map(t=>'<tr><td>'+esc(t.id)+'</td><td>'+esc(t.from_account)+'</td><td>'+esc(t.to_account)+
-      '</td><td class="money">'+esc(t.amount_minor)+'</td><td>'+esc(t.memo||'')+'</td><td class="foot">'+esc(t.created_at||'')+'</td></tr>').join('')+'</table>'
-      : '<div class="foot">no transfers</div>';
-  }else $('txOut').innerHTML='<div class="msg err">'+esc(text)+'</div>';
+    $('txOut').innerHTML = json.length
+      ? '<table><tr><th>Date</th><th>From</th><th>To</th><th>Amount</th><th>Memo</th></tr>'+
+        json.map(t=>'<tr><td class="foot">'+esc((t.created_at||'').slice(0,10))+'</td><td>'+esc(t.from_account)+'</td><td>'+esc(t.to_account)+'</td><td class="money">'+esc(money(t.amount_minor))+'</td><td>'+esc(t.memo||'')+'</td></tr>').join('')+'</table>'
+      : '<div class="foot">No recent activity.</div>';
+  }else $('txOut').innerHTML='<div class="msg err">Could not load activity.</div>';
 }
 async function doTransfer(){
-  const body={from:num($('tFrom').value),to:num($('tTo').value),amountMinor:num($('tAmt').value),memo:$('tMemo').value};
-  const {json,text,ok}=await api('POST',CONFIG.transfer,{body,auth:$('sendAuth').checked,internal:$('sendInternalT').checked});
-  if(ok&&json&&json.status==='POSTED')
-    msg($('transferMsg'),true,'Posted #'+json.transferId+' · from-balance now '+money(json.fromBalanceAfter)+' · actingSubject='+json.actingSubject);
-  else msg($('transferMsg'),false, ok&&json?(json.status+': '+(json.reason||'')):text);
-  await loadAllAccounts(); loadMine();
-  if($('txAcct').value) loadTransfers();
+  const from=$('tFrom').value, toRaw=$('tTo').value.trim(), amtRaw=$('tAmt').value.trim();
+  if(!toRaw||!amtRaw){ msg($('transferMsg'),false,'Enter a destination account and an amount.'); return; }
+  const body={from:Number(from),to:Number(toRaw),amountMinor:Math.round(Number(amtRaw)*100),memo:$('tMemo').value};
+  const {json,text,ok}=await api('POST',API.transfer,body);
+  if(ok&&json&&json.status==='POSTED') msg($('transferMsg'),true,'Transfer complete. New balance: '+money(json.fromBalanceAfter));
+  else msg($('transferMsg'),false,(ok&&json)?('Transfer declined: '+(json.reason||json.status||'')):'Transfer could not be completed.');
+  loadAccounts();
 }
+function msg(el,ok,m){el.className='msg '+(ok?'ok':'err');el.textContent=m;}
 
-/* ---------- internal / extras ---------- */
-async function internalHealth(){const{text,ok}=await api('GET',$('intPath').value.trim(),{auth:true,internal:$('sendInternalHdr').checked});msg($('internalMsg'),ok,text);}
-async function internalBatch(){let legs;try{legs=JSON.parse($('batchJson').value);}catch(e){return msg($('internalMsg'),false,'bad JSON: '+e.message);}
-  const{text,ok}=await api('POST',CONFIG.internalBatch,{body:legs,auth:true,internal:$('sendInternalHdr').checked});msg($('internalMsg'),ok,text);loadAllAccounts().then(loadMine);}
-async function assistantConfig(){const{text,ok}=await api('GET',CONFIG.assistantCfg,{auth:true});msg($('extraMsg'),ok,text);}
-async function actuatorEnv(){const{text,ok}=await api('GET',CONFIG.actuatorEnv);msg($('extraMsg'),ok,text.slice(0,1500));}
-async function doReset(){const{text,ok}=await api('POST',CONFIG.reset);msg($('extraMsg'),ok,text);loadAllAccounts().then(loadMine);}
-
-/* ==================== DEV MODE side window ==================== */
-let devWin=null;
-function openDev(){
-  devWin=window.open('','nibbsDev','width=540,height=820,scrollbars=yes');
-  if(!devWin){alert('Popup blocked — allow popups for this page to use Dev mode.');return;}
-  devWin.document.open();
-  devWin.document.write(`<!DOCTYPE html><title>NIBBS Lab · dev log</title>
-    <style>body{font:12px/1.5 system-ui,sans-serif;margin:0;background:#0d1117;color:#d7dee8}
-    header{position:sticky;top:0;background:#111826;padding:8px 12px;border-bottom:1px solid #263142;
-      display:flex;gap:10px;align-items:center}header b{color:#58a6ff}
-    button{font:11px sans-serif;background:#1f2937;color:#d7dee8;border:1px solid #374151;border-radius:4px;padding:3px 8px;cursor:pointer}
-    .e{border-bottom:1px solid #1b2430;padding:8px 12px}
-    .q{color:#58a6ff;font-family:monospace;font-weight:700}
-    .s{font-weight:700}.s.ok{color:#3fb950}.s.bad{color:#f85149}
-    pre{white-space:pre-wrap;word-break:break-all;margin:4px 0;color:#9fb0c3;font-size:11px}
-    .hd{color:#6b7684}</style>
-    <header><b>Dev log</b><span>every API call (Burp is still your real tracker)</span>
-      <button onclick="document.getElementById('L').innerHTML=''" style="margin-left:auto">clear</button></header>
-    <div id="L"></div>`);
-  devWin.document.close();
-  // backfill existing entries
-  BUFFER.forEach(e=>paintReq(e)&&e._res&&paintRes(e));
-}
-const BUFFER=[];
-function devLogReq(method,path,headers,body){
-  const e={id:BUFFER.length,method,path,headers,body,res:null,text:null,_res:false};
-  BUFFER.push(e); paintReq(e); return e;
-}
-function devLogRes(e,res,text){ e.res=res; e.text=text; e._res=true; paintRes(e); }
-function winL(){ return devWin && !devWin.closed ? devWin.document.getElementById('L') : null; }
-function paintReq(e){
-  const L=winL(); if(!L) return false;
-  const hs=Object.entries(e.headers).map(([k,v])=>k+': '+v).join('\n');
-  const d=devWin.document.createElement('div'); d.className='e'; d.id='e'+e.id;
-  d.innerHTML='<div class="q">&#9654; '+esc(e.method)+' '+esc(e.path)+'</div>'+
-    (hs?'<pre class="hd">'+esc(hs)+'</pre>':'')+(e.body?'<pre>'+esc(e.body)+'</pre>':'')+'<div class="rs"></div>';
-  L.insertBefore(d,L.firstChild); return true;
-}
-function paintRes(e){
-  const L=winL(); if(!L) return;
-  let el=devWin.document.getElementById('e'+e.id); if(!el){ if(paintReq(e)) el=devWin.document.getElementById('e'+e.id); }
-  if(!el) return;
-  const rs=el.querySelector('.rs');
-  if(!e.res){ rs.innerHTML='<div class="s bad">&#9664; '+esc(e.text)+'</div>'; return; }
-  rs.innerHTML='<div class="s '+(e.res.ok?'ok':'bad')+'">&#9664; '+e.res.status+' '+esc(e.res.statusText)+'</div><pre>'+esc(e.text)+'</pre>';
-}
-
-/* Enter key submits login */
 $('password').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 $('username').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 </script>
