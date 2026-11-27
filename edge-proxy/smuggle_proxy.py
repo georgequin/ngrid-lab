@@ -162,6 +162,28 @@ def _up_read_one_response(conn):
     return head + body
 
 
+def _force_client_close(response):
+    """This proxy serves ONE request per client connection then closes it.
+    Advertise that with `Connection: close` on the client-facing response so
+    keep-alive clients (browsers, Burp) open a fresh connection per request
+    instead of reusing the just-closed socket and getting "no response from
+    remote server". Only the response HEAD sent to the client is rewritten;
+    upstream framing, the body, the LIFO pool and the smuggling desync are all
+    left exactly as they were."""
+    head, sep, body = response.partition(b"\r\n\r\n")
+    if not sep:
+        return response
+    lines = head.split(b"\r\n")
+    kept = [lines[0]]  # status line
+    for ln in lines[1:]:
+        name = ln.split(b":", 1)[0].strip().lower()
+        if name in (b"connection", b"keep-alive", b"proxy-connection"):
+            continue
+        kept.append(ln)
+    kept.append(b"Connection: close")
+    return b"\r\n".join(kept) + b"\r\n\r\n" + body
+
+
 def handle_client(client, addr):
     try:
         head, leftover = _client_read_headers(client)
@@ -215,7 +237,7 @@ def handle_client(client, addr):
                 _reset(conn)
                 _ensure_sock(conn).sendall(raw_request)
                 response = _up_read_one_response(conn)
-            client.sendall(response)
+            client.sendall(_force_client_close(response))
         finally:
             _checkin(conn)
     except Exception as e:  # noqa
