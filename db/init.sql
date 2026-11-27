@@ -33,6 +33,10 @@ INSERT INTO accounts (id, owner_sub, currency, balance_minor) VALUES
     (1001, 'alice',          'NGN', 2500000),
     (1002, 'bob',            'NGN',  180000),
     (1003, 'carol',          'USD',   90000),
+    (1004, 'david',          'NGN', 1250000),
+    (1005, 'ngozi',          'NGN',  640000),
+    (1006, 'tunde',          'NGN',   45000),
+    (1007, 'amaka',          'USD',  120000),
     (9001, 'internal-system','NGN', 999999999)
 ON CONFLICT (id) DO NOTHING;
 

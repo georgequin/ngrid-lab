@@ -26,6 +26,6 @@ public class ResetController {
     @PostMapping
     public Map<String, Object> reset() {
         ledger.resetLedger();
-        return Map.of("status", "RESET", "accounts", "1001,1002,1003,9001");
+        return Map.of("status", "RESET", "accounts", "1001,1002,1003,1004,1005,1006,1007,9001");
     }
 }

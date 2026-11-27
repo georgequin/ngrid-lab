@@ -106,6 +106,10 @@ public class LedgerService {
         jdbc.update("UPDATE accounts SET balance_minor = 2500000 WHERE id = 1001");
         jdbc.update("UPDATE accounts SET balance_minor = 180000  WHERE id = 1002");
         jdbc.update("UPDATE accounts SET balance_minor = 90000   WHERE id = 1003");
+        jdbc.update("UPDATE accounts SET balance_minor = 1250000 WHERE id = 1004");
+        jdbc.update("UPDATE accounts SET balance_minor = 640000  WHERE id = 1005");
+        jdbc.update("UPDATE accounts SET balance_minor = 45000   WHERE id = 1006");
+        jdbc.update("UPDATE accounts SET balance_minor = 120000  WHERE id = 1007");
         jdbc.update("UPDATE accounts SET balance_minor = 999999999 WHERE id = 9001");
     }
 }
