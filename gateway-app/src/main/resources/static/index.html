@@ -96,14 +96,26 @@ const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const money=(m,c)=>{const n=Number(m);return isFinite(n)?(n/100).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})+(c?' '+c:''):String(m);};
 
-async function api(method,path,body){
+// The lab edge-proxy intermittently throws transient 4xx/5xx/connection blips.
+// Retry idempotent reads a few times so one blip can't blank the dashboard.
+// Never auto-retried: the transfer POST (non-idempotent) — opts out via retry:1.
+async function api(method,path,body,opts){
+  const retries=(opts&&opts.retry!=null)?opts.retry:(method==='GET'?3:1);
   const headers={};
   if(body!==undefined) headers['Content-Type']='application/json';
   if(STATE.token) headers['Authorization']='Bearer '+STATE.token;
-  const res=await fetch(path,{method,headers,body:body!==undefined?JSON.stringify(body):undefined});
-  const text=await res.text();
-  let json=null; try{json=JSON.parse(text);}catch(_){}
-  return {res,text,json,ok:res.ok};
+  let last;
+  for(let attempt=1;attempt<=retries;attempt++){
+    try{
+      const res=await fetch(path,{method,headers,body:body!==undefined?JSON.stringify(body):undefined});
+      const text=await res.text();
+      let json=null; try{json=JSON.parse(text);}catch(_){}
+      last={res,text,json,ok:res.ok};
+      if(res.ok) return last;            // success — done
+    }catch(e){ last={res:null,text:String(e&&e.message||e),json:null,ok:false}; }
+    if(attempt<retries) await new Promise(r=>setTimeout(r,150*attempt));  // brief backoff
+  }
+  return last;                           // exhausted retries — return last outcome
 }
 
 async function doLogin(){
@@ -111,7 +123,7 @@ async function doLogin(){
   const username=$('username').value.trim(), password=$('password').value;
   if(!username){$('loginErr').textContent='Enter your username.';return;}
   let r;
-  try{ r=await api('POST',API.login,{username,password}); }
+  try{ r=await api('POST',API.login,{username,password},{retry:3}); }
   catch(e){ $('loginErr').textContent='Cannot reach the server. Please try again.'; return; }
   if(r.ok && r.json && r.json.token){
     STATE.token=r.json.token; STATE.subject=username;
